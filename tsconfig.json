@@ -1,0 +1,19 @@
+{
+	"include": ["./src/index.ts"],
+	"exclude": ["**/node_modules/**"],
+	"compilerOptions": {
+		"outDir": "./dist/",
+		"module": "ES2022",
+		"target": "ES2022",
+		"moduleResolution": "node",
+		"strict": true,
+		"types": ["node"],
+		"declaration": true,
+		"resolveJsonModule": true,
+		"allowSyntheticDefaultImports": true,
+		"esModuleInterop": true,
+		"verbatimModuleSyntax": true,
+		"isolatedModules": true,
+		"alwaysStrict": true
+	}
+}
