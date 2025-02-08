@@ -30,65 +30,78 @@
  */
 
 import type { Plugin } from 'esbuild'
+import { glob } from 'glob'
 import * as fs from 'fs'
-import * as pathjs from 'path'
+import { fileURLToPath } from 'url'
 
-const NODE_MODULES_PATH = './node_modules/'
+const DEFAULT_GLOB = '**/node_modules/**/*.ts'
 
 interface IOptions {
+	// I had to use a weird unicode character to prevent the default
+	// glob from being interpreted as the end of the comment
 	/**
 	 * The path to the node_modules directory.
-	 * @default './node_modules/'
+	 *
+	 * Defaults to **&#8205;/node_modules/**&#8205;/*.ts
 	 */
-	nodeModulesPath?: string
+	nodeModulesGlob?: string
 	/**
 	 * Glob patterns to ignore.
+	 * @default undefined
 	 */
 	ignore?: string[]
+	/**
+	 * The text to add to the top of the file to disable TypeScript issues.
+	 * @default `// @ts-nocheck\n`
+	 */
+	comment?: string
+	/**
+	 * Whether to suppress unimportant logs.
+	 */
+	quiet?: boolean
 }
 
-async function disableNodeModulesIssues() {
-	let foundFilesThatWerentIgnored = false
-	async function recurse(path: string) {
-		const names = await fs.promises.readdir(path)
-		for (const name of names) {
-			if (name.startsWith('.')) continue
-			const childPath = pathjs.join(path, name)
-			const stat = fs.statSync(childPath)
-			if (stat.isDirectory()) {
-				await recurse(childPath)
-			} else {
-				if (childPath.endsWith('.ts')) {
-					const content = await fs.promises.readFile(childPath, 'utf-8')
-					if (content.startsWith('// @ts-nocheck\n')) continue
-					const newContent = '// @ts-nocheck\n' + content
-					await fs.promises.writeFile(childPath, newContent)
-					foundFilesThatWerentIgnored = true
-				}
-			}
-		}
+async function disableNodeModulesIssues(options?: IOptions) {
+	const {
+		nodeModulesGlob = DEFAULT_GLOB,
+		ignore,
+		comment = '// @ts-no-check\n',
+		quiet,
+	} = options ?? {}
+
+	const paths = await glob(nodeModulesGlob, { ignore })
+
+	let filesThatWerentIgnored = 0
+	!quiet && console.log('⛔ Disabling TypeScript issues in all node_modules...')
+	for (const path of paths) {
+		const content = await fs.promises.readFile(path, 'utf-8')
+		if (content.startsWith(comment)) continue
+		// Add the comment
+		const newContent = comment + content
+		await fs.promises.writeFile(path, newContent)
+		filesThatWerentIgnored++
 	}
 
-	console.log('⛔ Disabling TypeScript issues in all node_modules...')
-	if (foundFilesThatWerentIgnored) {
-		console.log('⚠️ Found some files that were not ignored before this patch run.')
+	if (filesThatWerentIgnored > 0) {
+		console.log(
+			`⚠️ Found ${filesThatWerentIgnored} file(s) that were not ignored before this patch run.`
+		)
 		console.log(
 			'\tPlease restart the TS language server to update the problems view. (F1 + "TypeScript: Restart TS server" in VSCode)'
 		)
 	}
-	await recurse(NODE_MODULES_PATH)
-	console.log('✅ Disabled TypeScript issues in all node_modules')
+	!quiet && console.log('✅ Disabled TypeScript issues in all node_modules')
 }
 
-export default function esbuildPlugin(): Plugin {
+export default function esbuildPlugin(options?: IOptions): Plugin {
 	return {
 		name: 'node-modules-vscode-problems-patch',
 		async setup() {
-			await disableNodeModulesIssues()
+			await disableNodeModulesIssues(options)
 		},
 	}
 }
 
-if (require.main === module) {
+if (process.argv[1] === fileURLToPath(import.meta.url)) {
 	disableNodeModulesIssues()
 }
