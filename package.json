@@ -2,7 +2,7 @@
 	"name": "node-modules-vscode-problems-patch",
 	"displayName": "Node Modules VSCode Problems View Patch",
 	"description": "Forces TypeScript to ignore `node_modules`. Preventing VSCode from showing errors in the problems view from files in `node_modules`.",
-	"version": "1.0.1",
+	"version": "1.0.2",
 	"author": {
 		"name": "Titus Evans",
 		"email": "SnaveSutit@gmail.com",

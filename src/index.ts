@@ -65,7 +65,7 @@ async function disableNodeModulesIssues(options?: IOptions) {
 	const {
 		nodeModulesGlob = DEFAULT_GLOB,
 		ignore,
-		comment = '// @ts-no-check\n',
+		comment = '// @ts-nocheck\n',
 		quiet,
 	} = options ?? {}
 
