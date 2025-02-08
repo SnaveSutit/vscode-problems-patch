@@ -2,15 +2,13 @@
 	"name": "node-modules-vscode-problems-patch",
 	"displayName": "Node Modules VSCode Problems View Patch",
 	"description": "Forces TypeScript to ignore `node_modules`. Preventing VSCode from showing errors in the problems view from files in `node_modules`.",
-	"version": "1.0.3",
+	"version": "1.0.6",
 	"author": {
 		"name": "Titus Evans",
 		"email": "SnaveSutit@gmail.com",
 		"url": "https://snavesutit.github.io/"
 	},
-	"bin": {
-		"node-modules-vscode-problems-patch": "dist/index.js"
-	},
+	"bin": "./dist/index.js",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/SnaveSutit/vscode-problems-patch"

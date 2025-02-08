@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 /**!
  *
  * node-modules-vscode-problems-patch
