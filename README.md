@@ -2,7 +2,7 @@
 
 This tool adds a comment to the top of every `.ts` and `.d.ts` file in your project's `./node_modules` directory to prevent VSCode from showing problems from these files.
 
-_Note that this will prevent the TypeScript compiler from checking these files for errors when compiling your project._
+_Note that this will prevent the TypeScript compiler from checking these files for type errors when compiling your project._
 
 ## Usage
 
