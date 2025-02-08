@@ -1,0 +1,23 @@
+{
+	"name": "node-modules-vscode-problems-patch",
+	"description": "Forces TypeScript to ignore `node_modules`. Preventing VSCode from showing errors in the problems view from files in `node_modules`.",
+	"version": "1.0.0",
+	"type": "module",
+	"files": [
+		"dist"
+	],
+	"types": "dist/index.d.ts",
+	"scripts": {
+		"dev": "tsc -w",
+		"build": "tsc",
+		"start": "node dist/index.js"
+	},
+	"dependencies": {
+		"esbuild": "^0.24.2"
+	},
+	"devDependencies": {
+		"@types/node": "^22.13.1",
+		"glob": "^11.0.1",
+		"typescript": "^5.7.3"
+	}
+}
