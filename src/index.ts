@@ -43,7 +43,7 @@ interface IOptions {
 	/**
 	 * The path to the node_modules directory.
 	 *
-	 * Defaults to **&#8205;/node_modules/**&#8205;/*.ts
+	 * Defaults to \*\*&#8205;/node_modules/\*\*&#8205;/*.ts
 	 */
 	nodeModulesGlob?: string
 	/**
@@ -62,6 +62,8 @@ interface IOptions {
 	quiet?: boolean
 }
 
+const BIN_COMMENT = '#!/usr/bin/env'
+
 async function disableNodeModulesIssues(options?: IOptions) {
 	const {
 		nodeModulesGlob = DEFAULT_GLOB,
@@ -75,11 +77,21 @@ async function disableNodeModulesIssues(options?: IOptions) {
 	let filesThatWerentIgnored = 0
 	!quiet && console.log('⛔ Disabling TypeScript issues in all node_modules...')
 	for (const path of paths) {
-		const content = await fs.promises.readFile(path, 'utf-8')
+		const stat = await fs.promises.stat(path)
+		if (!stat.isFile()) continue
+		let content = await fs.promises.readFile(path, 'utf-8')
 		if (content.startsWith(comment)) continue
+
+		let binComment = ''
+		if (content.startsWith(BIN_COMMENT)) {
+			const firstNewline = content.indexOf('\n')
+			binComment = content.slice(0, firstNewline + 1)
+			content = content.slice(firstNewline + 1)
+		}
+
 		// Add the comment
-		const newContent = comment + content
-		await fs.promises.writeFile(path, newContent)
+		content = binComment + comment + content
+		await fs.promises.writeFile(path, content)
 		filesThatWerentIgnored++
 	}
 
